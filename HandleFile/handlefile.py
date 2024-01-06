@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-import exslog
 import os
 import subprocess
 
@@ -27,7 +24,7 @@ class HandleFile:
         if m_file_name == "":
             self.file_name = "None"
         else:
-            self.file_name = m_file_name
+            self.file_name = str(m_file_name)
 
 
     def __str__(self): # -> returns self.file_name
@@ -47,37 +44,42 @@ class HandleFile:
 
 
 
-    def copy_to(self, m_destination: str="") -> list: # TO DO: -> copy self.file_name to destination
+    def copy_to(self, m_destination: str="") -> list: # -> copy self.file_name to destination
         if self.is_dir():
             print("can not copy directories")
-        else:
-            if not self.exists():
-                print("source file to copy doesn't exist")
-            else:
-                dest = HandleFile(m_destination)
+            return []
+        
+        if not self.exists():
+            print("source file to copy doesn't exist")
+            return []
 
-                own_sha256 = self.get_sha256()
-                copied_sha256 = ""
-                
-                if dest.file_name == "None":
-                    print("dir path can not be empty")
-                else:
-                    if not dest.exists():
-                        print("dest doesn't exist")
-                    else:
-                        if not dest.is_dir():
-                            print("dir path must be leading to a directory")
-                        else:
-                            src = self.get_absolute()
-                            dst = f'{dest.get_absolute()}/{self.file_name}'
+        
+        dest = HandleFile(m_destination) # dir, but I know. Had to use it for the sake of below if's
+        
+        if dest.file_name == "None":
+            print("dir path can not be empty")
+            return []
+        
+        if not dest.exists():
+            print("dir path doesn't exist")
+            return []
+        
+        if not dest.is_dir():
+            print("dir path must be leading to a directory")
+            return []
+            
 
-                            subprocess.check_output(["cp", src, dst])
+        src = self.get_absolute()
+        dst = f'{dest.get_absolute()}/{self.file_name}'
 
-                            checksum = HandleFile(f'{dest.get_absolute()}/{self.file_name}')
-                            copied_sha256 = checksum.get_sha256()
-                
-                if own_sha256 != copied_sha256:
-                    print("copying not successful")
+        subprocess.check_output(["cp", src, dst])
+        
+        checksum = HandleFile(dst)
+        copied_sha256 = checksum.get_sha256()
+        
+        if self.get_sha256() != copied_sha256:
+            print("copying failed")
+            return []
         
         return [src, dst]
 
@@ -112,17 +114,4 @@ class HandleFile:
     
     def is_dir(self) -> bool: # true if is dir, false if doesn't
         return os.path.isdir(self.get_absolute())
-
-
-if __name__ == "__main__":
-    user_verbose = 1
-    success = exslog.Exslog("success", user_verbose)
-    failure = exslog.Exslog("failure", user_verbose)
-    error = exslog.Exslog("error", user_verbose)
-    info = exslog.Exslog("info", user_verbose)
-    warn = exslog.Exslog("warn", user_verbose)
-
-
-    file = HandleFile("handlefile.py")
-    file.copy_to("/home/t0tal/hack/git-projects/python-libs/HandleFile")
 
