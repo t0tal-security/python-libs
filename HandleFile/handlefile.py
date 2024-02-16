@@ -21,7 +21,7 @@ is_dir - checks if name is dir
 
 
 class HandleFile:
-    def __init__(self, m_file_name: str=""): # assigns self.file_name with given value or "None" if empty
+    def __init__(self, m_file_name: str=""):
         self.file_name = ""
         self.file_path = 0
 
@@ -42,11 +42,11 @@ class HandleFile:
                     self.file_path = str(m_file_name)
 
 
-    def __str__(self): # -> returns self.file_name
+    def __str__(self):
         return self.file_name
 
 
-    def set_file(self, m_file_name: str="") -> None: # -> set self.file_name to given value or "None" if empty
+    def set_file(self, m_file_name: str="") -> None:
         if m_file_name == "":
             self.file_name = "None"
             self.file_path = 0
@@ -73,7 +73,7 @@ class HandleFile:
 
 
 
-    def copy_to(self, m_destination: str="") -> list: # -> copy self.file_name to destination
+    def copy_to(self, m_destination: str="") -> list:
         if not self.exists():
             print("source file to copy doesn't exist")
             return []
@@ -123,7 +123,7 @@ class HandleFile:
             return "n/a ( non-existent )"
 
         if not self.is_file():
-            return "n/a ( dir )"
+            return "n/a ( not file )"
 
         result = str(subprocess.check_output(["sha256sum", self.get_absolute()]))
         checksum = result.split("'")[1].split(" ")[0] # raw sha256
